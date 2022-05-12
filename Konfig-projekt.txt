@@ -1,0 +1,194 @@
+ R3-
+E0/1 - 193.91.16.21/30
+E0/2->ospf -193.91.16.6/30
+E0/3->ospf -193.91.16.18/30
+E1/0- 193.91.16.126/26
+E1/1 - 193.91.16.253/25
+VRRP 1
+vrrp 1 ip 193.91.16.65
+vrrp 1 preempt
+VRRP 2
+vrrp 2 ip 193.91.16.129
+vrrp 2 priority 90
+router ospf 10
+network 193.91.16.4 0.0.0.3 area 0
+network 193.91.16.16 0.0.0.3 area 0
+network 193.91.16.20 0.0.0.3 area 0
+network 193.91.16.64 0.0.0.63 area 1
+network 193.91.16.128 0.0.0.127 area 2
+
+
+
+R4-
+E0/1 - 193.91.16.22/30
+E0/2->ospf -193.91.16.14/30
+E0/3->ospf -193.91.16.10/30
+E1/0 - 193.91.16.254/25
+E1/1- 193.91.16.125/26
+VRRP 1
+vrrp 1 ip 193.91.16.65
+vrrp 1 priority 90
+VRRP 2
+vrrp 2 ip 193.91.16.129
+vrrp 2 preempt
+router ospf 10
+network 193.91.16.12 0.0.0.3 area 0
+network 193.91.16.8 0.0.0.3 area 0
+network 193.91.16.20 0.0.0.3 area 0
+network 193.91.16.64 0.0.0.63 area 1
+network 193.91.16.128 0.0.0.127 area 2
+
+
+R1-  FIRMA AS 12741 193.91.16.0/24
+E0/0->isp1 – 188.241.24.2/30
+E0/1->R2 -193.91.16.1/30
+E0/2->ospf -193.91.16.5/30
+E0/3->ospf - 193.91.16.9/30
+BGP
+neighbor 188.241.24.1 remote-as 205384
+neighbor 193.91.16.2 remote-as 12741
+network 193.91.16.0/24
+redisribute connected
+auto-summary
+router ospf 10
+network 193.91.16.4 0.0.0.3 area 0
+network 193.91.16.8 0.0.0.3 area 0
+default information originate metric 200
+
+R2- FIRMA AS 12741 193.91.16.0/24
+E0/0->isp2 - 188.93.160.2/30
+E0/1->R1 - 193.91.16.2/30
+E0/2->ospf -193.91.16.13/30
+E0/3->ospf -193.91.16.17/30
+BGP
+neighbor 188.93.160.1 remote-as 6830
+neighbor 193.91.16.1 remote-as 12741
+network 193.91.16.0/24
+redisribute connected
+auto-summary
+router ospf 10
+network 193.91.16.12 0.0.0.3 area 0
+network 193.91.16.16 0.0.0.3 area 0
+default information originate metric 300
+
+R5-PODODDZIAŁ AS 62201 -185.149.200.0/24
+E0/0->isp3 - 178.43.251.2/30
+E0/1- 185.149.200.1/24
+BGP
+neighbor 178.43.251.1 remote-as 5617
+network 185.149.200.0/24
+redistribute connected
+
+ISP1-  AS 205384 188.241.24.0/24
+E0/0->R1->188.241.24.1/30
+E0/1->46.22.167.2/30
+E1/0->84.205.186.6/30
+BGP
+neighbor 46.22.167.1 remote-as 42927
+neighbor 84.205.186.5 remote-as 31242
+neighbor 188.241.24.2 remote-as 12741
+network 188.241.24.0/24
+redistribute connected
+
+ISP2- AS 6830 188.93.160.0/24
+E0/0->R2->188.93.160.1/30
+E0/2->65.49.14.10/30
+E1/1->84.205.186.10/30
+BGP
+neighbor 84.205.186.9 remote-as 31242
+neighbor 65.49.14.9 remote-as 6939
+neighbor 188.93.160.2 remote-as 12741
+network 188.93.160.0/24
+redistribute connected
+
+
+ISP3- AS 5617 178.43.251.0/24
+E0/0->R5->178.43.251.1/30
+E0/1->65.49.14.6/30
+E1/2->84.205.186.14/30
+BGP
+neighbor 65.49.14.5 remote-as 6939
+neighbor 84.205.186.13 remote-as 31242
+neighbor 178.43.251.2 remote-as 62201
+network 178.43.251.0/24
+redistribute connected
+
+Warszawa- AS30793 185.58.160.0/24
+E0/1->185.58.160.1/30
+E0/2->128.242.94.2/30
+E0/3->193.45.6.10/30
+BGP
+neighbor 128.242.94.1 remote-as 2914
+neighbor 193.45.6.9 remote-as 1299
+network 185.58.160.0/24
+redistribute connected
+
+Kraków AS42927 46.22.167.0/24
+E0/0-> 193.45.6.2/30
+E0/1->46.22.167.1/30
+E0/3->84.205.186.2/30
+E1/0->65.49.14.14/30
+BGP
+neighbor 193.45.6.1 remote-as 1299
+neighbor 46.22.167.2 remote-as 205384
+neighbor 84.205.186.1 remote-as 31242
+neighbor 65.49.14.13 remote-as 6939
+network 46.22.167.0/24
+redistribute connected
+
+Katowice AS31242 84.205.186.0/24
+E0/0->65.49.14.2/30
+E0/3->84.205.186.1/30
+E1/0->84.205.186.5/30
+E1/1->84.205.186.9/30
+E1/2->84.205.186.13/30
+BGP
+neighbor 65.49.14.1 remote-as 6939
+neighbor 84.205.186.2 remote-as 42927
+neighbor 84.205.186.6 remote-as 205384
+neighbor 84.205.186.10 remote-as 6830
+neighbor 84.205.186.14 remote-as 5617 
+network 46.22.167.0/24
+redistribute connected
+
+Poznań AS6939 65.49.14.0/24
+E0/0->65.49.14.1/30
+E0/1->65.49.14.5/30
+E0/2->65.49.14.9/30
+E0/3->128.242.94.6/30
+E1/0->65.49.14.13/30
+BGP
+neighbor 65.49.14.2 remote-as 31242
+neighbor 65.49.14.6 remote-as 5617 
+neighbor 65.49.14.10 remote-as 6830 
+neighbor 128.242.94.5 remote-as 2914
+neighbor 65.49.14.14 remote-as 42927
+network 65.49.14.0/24
+redistribute connected
+
+Wrocław AS1299 193.45.6.0/24 193.45.11.0/24
+E0/0-> 193.45.6.1/30
+E0/1-> 193.45.11.1/30
+E0/3-> 193.45.6.9/30
+router bgp 1299
+ bgp log-neighbor-changes
+ network 193.45.6.0
+ network 193.45.11.0
+ redistribute connected
+ neighbor 193.45.6.2 remote-as 42927
+ neighbor 193.45.6.10 remote-as 30793
+ neighbor 193.45.11.2 remote-as 2914
+
+
+Lublin AS2914 128.242.94.0/24
+E0/1-> 193.45.11.2/30
+E0/2-> 128.242.94.1/30
+E0/3-> 128.242.94.5/30
+router bgp 2914
+ bgp router-id 128.242.94.5
+ bgp log-neighbor-changes
+ network 128.242.94.0 mask 255.255.255.0
+ redistribute connected
+ neighbor 128.242.94.2 remote-as 30793
+ neighbor 128.242.94.6 remote-as 6939
+ neighbor 193.45.11.1 remote-as 1299
